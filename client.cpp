@@ -13,6 +13,7 @@ void udpClient(char *IPaddress, char *portNumber)
 	SOCKET hServSock;
 	struct sockaddr_in servAddr;
 	char b[MAX] = {};
+	char a[MAX];
 	int n=0;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -32,8 +33,9 @@ void udpClient(char *IPaddress, char *portNumber)
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = inet_addr(IPaddress);
 	servAddr.sin_port = htons(atoi(portNumber));
-	
-	FILE* FP =fopen("C:/Users/alps/Documents/Visual Studio 2010/Projects/client/Debug/abc.txt","r");
+	cout<<"ÆÄÀÏ:";
+	cin>>a;
+	FILE* FP =fopen(a,"r");
 
 	while( (n = fread(b, 1, MAX, FP)) > 0 )
 	b[n] = 0;

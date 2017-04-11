@@ -12,6 +12,7 @@ void udpServer(char *portNumber)
 	SOCKET hServSock;
 	struct sockaddr_in hServAddr, hClntAddr;
 	char buf[MAX];
+	char a[MAX];
 	int clen = sizeof(hClntAddr);
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -39,7 +40,9 @@ void udpServer(char *portNumber)
 		closesocket(hServSock);
 		exit(1);
 	}
-	FILE *FP =fopen("C:/Users/alps/Documents/Visual Studio 2010/Projects/server/Debug/abc.txt","w");
+	cout<<"ÆÄÀÏ:";
+	cin>>a;
+	FILE *FP =fopen(a,"w");
 
 	recvfrom(hServSock, buf, MAX, 0, (struct sockaddr *) &hClntAddr, &clen);
 	fprintf(FP,"%s",buf);
