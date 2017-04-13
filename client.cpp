@@ -2,19 +2,18 @@
 #include <cstdio>
 #include <cstdlib>
 #include <WinSock2.h>
-#pragma comment (lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib")
 using namespace std;
 
-#define MAX 9999
+#define MAX 1025
 
 void udpClient(char *IPaddress, char *portNumber)
 {
 	WSADATA wsaData;
+	char a[101],buf[MAX],ch[5];
+	int n=0;
 	SOCKET hServSock;
 	struct sockaddr_in servAddr;
-	char b[MAX] = {};
-	char a[MAX];
-	int n=0;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
@@ -34,15 +33,17 @@ void udpClient(char *IPaddress, char *portNumber)
 	servAddr.sin_addr.s_addr = inet_addr(IPaddress);
 	servAddr.sin_port = htons(atoi(portNumber));
 	cout<<"파일:";
+
 	cin>>a;
-	FILE* FP =fopen(a,"r");
-
-	while( (n = fread(b, 1, MAX, FP)) > 0 )
-	b[n] = 0;
+	FILE* fp=fopen(a,"rb");
+	while(0< (n=fread(buf,1,1024,fp)))
+	{
+		itoa(n,ch,10);
+		sendto(hServSock, ch, 5, 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
+		sendto(hServSock, buf, n, 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
+	}
+	sendto(hServSock, "endf", 5, 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 	
-	fclose(FP);
-
-	sendto(hServSock, b, MAX, 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 }
 
 void main()
@@ -52,7 +53,7 @@ void main()
 	cin>>a;
 	cout<<"포트번호:";
 	cin>>b;
-
+	getchar();
 
 	udpClient(a,b);
 	

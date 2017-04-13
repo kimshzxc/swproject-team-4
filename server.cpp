@@ -1,18 +1,19 @@
 #include <iostream>
 #include <cstdio>
-#include <string.h>
 #include <WinSock2.h>
-#pragma comment (lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib")
 using namespace std;
-#define MAX 9999
-int c=0;
+
+#define MAX 1025
+
 void udpServer(char *portNumber)
 {
+	char a[101],ch[5];
+	int num;
 	WSADATA wsaData;
 	SOCKET hServSock;
 	struct sockaddr_in hServAddr, hClntAddr;
 	char buf[MAX];
-	char a[MAX];
 	int clen = sizeof(hClntAddr);
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -42,17 +43,24 @@ void udpServer(char *portNumber)
 	}
 	cout<<"파일:";
 	cin>>a;
-	FILE *FP =fopen(a,"w");
+	FILE *fp=fopen(a,"wb");
+	while(1)
+	{
+	recvfrom(hServSock, ch, 5, 0, (struct sockaddr *) &hClntAddr, &clen);
+	if(!strcmp(ch,"endf"))
+	break;
+	num=atoi(ch);
 
-	recvfrom(hServSock, buf, MAX, 0, (struct sockaddr *) &hClntAddr, &clen);
-	fprintf(FP,"%s",buf);
-	fclose(FP);
+	recvfrom(hServSock, buf, num, 0, (struct sockaddr *) &hClntAddr, &clen);
+	
+	fwrite(buf,1,num,fp);
+	}
 }
 
 void main()
 {
 	char a[101];
-	cout<<"포트넘버:";
+	cout<<"포트번호:";
 	cin>>a;
 
 
