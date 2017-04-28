@@ -1,9 +1,9 @@
-import java.io.FileOutputStream; 
-import java.io.IOException; 
-import java.io.InputStream; 
-import java.net.InetSocketAddress; 
-import java.net.ServerSocket; 
-import java.net.Socket; 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.io.File;
 
 public class server {

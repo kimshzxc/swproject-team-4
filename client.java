@@ -1,13 +1,9 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Scanner;
 public class client {
 public static final int DEFAULT_BUFFER_SIZE = 10000;
@@ -90,24 +86,6 @@ public static final int DEFAULT_BUFFER_SIZE = 10000;
 
 	}
 	
-	public int Func(String path)
-	{
-		int count=0;
-		File dirFile=new File(path);
-		File[] fileList=dirFile.listFiles();
-		for(int i=0;i<fileList.length;i++){
-			if(!fileList[i].isDirectory()){	
-				count++;
-			}
-			else if(fileList[i].isDirectory())
-			{
-				String temp=path+"\\"+fileList[i].getName();
-				count+=Func(temp);
-			}
-		}
-		return count;
-	}
-
 	public void FileFunc(String serverIP,int port,int port2,String Directory)
 	{
 		File dirFile=new File(Directory);
