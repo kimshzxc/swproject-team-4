@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -7,6 +9,27 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 public class client {
 public static final int DEFAULT_BUFFER_SIZE = 10000;
+
+public void StringTrans(String serverIP,int port3,String line)
+{
+
+             try{
+            	 Socket sock = new Socket(serverIP, port3);
+
+            	 OutputStream out = sock.getOutputStream();
+
+            	 PrintWriter pw = new PrintWriter(new OutputStreamWriter(out));
+
+                           pw.println(line);
+                           pw.flush();
+
+                    pw.close();
+                    out.close();
+                    sock.close();
+             }catch(Exception e){
+                    System.out.println(e);
+             }
+}
 
 	public void Transmit(String serverIP, int port, String FileName)
 	{
@@ -86,38 +109,40 @@ public static final int DEFAULT_BUFFER_SIZE = 10000;
 
 	}
 	
-	public void FileFunc(String serverIP,int port,int port2,String Directory)
+	public void FileFunc(String serverIP,int port,int port2,int port3,String Directory)
 	{
 		File dirFile=new File(Directory);
 		File[] fileList=dirFile.listFiles();
 		int flag=0;
 		for(int i=0;i<fileList.length;i++){
-			if(fileList[i].isFile()){	
-				String temp=Directory+"\\"+fileList[i].getName();
+			if(fileList[i].isFile()){
 				if(i==0)
 				flag=2;
 				else
 				flag=1;
+				String temp=Directory+"\\"+fileList[i].getName();
 				Activate(serverIP, port2, flag);
+				StringTrans(serverIP, port3, temp);
 			  	Transmit(serverIP, port, temp);
 			}
 			else if(fileList[i].isDirectory())
 			{
 				String temp=Directory+"\\"+fileList[i].getName();
-				FileFunc(serverIP, port, port2, temp);
+				FileFunc(serverIP, port, port2, port3, temp);
 			}
 		}
 	}
 	
   public static void main(String[] args) {
+
     String serverIP = "127.0.0.1";
-    int port = 9999, port2=9998; //port = 9999;
+    int port = 9999, port2=9998, port3=9997; //port = 9999;
+    client cli=new client();
     int n;
     String FileName,Directory,str;
     Scanner input=new Scanner(System.in);
     System.out.println("파일 단일 : 1 디렉토리 전송 : 2");
     str=input.next();
-    client cli=new client();
     if(str.equals("1"))
     {
     FileName=input.next();
@@ -127,7 +152,7 @@ public static final int DEFAULT_BUFFER_SIZE = 10000;
     }
   else if(str.equals("2")){
 	  Directory=input.next();
-	  cli.FileFunc(serverIP, port, port2, Directory);
+	  cli.FileFunc(serverIP, port, port2, port3,Directory);
 	  cli.Activate(serverIP, port2, 3);
 	  System.out.println("전송 완료");
 	  }
