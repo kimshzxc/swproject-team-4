@@ -146,7 +146,8 @@ public void StringTrans(String serverIP,int port3,String line)
     if(str.equals("1"))
     {
     FileName=input.next();
-    cli.Activate(serverIP, port2,1);
+    cli.Activate(serverIP, port2, 1);
+    cli.StringTrans(serverIP, port3, FileName);
     cli.Transmit(serverIP, port, FileName);
     cli.Activate(serverIP, port2,3);
     }
