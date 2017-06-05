@@ -1,18 +1,39 @@
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.io.File;
+import java.io.*;
+import java.net.*;
 
 public class server {
   public static final int DEFAULT_BUFFER_SIZE = 10000;
   public int i=0;
+		
 
+	public void createAndWriteFile(FileEvent fileEvent,double startTime,String outputFile) {
+		double diffTime;
+		double endTime;
+
+		if (!new File(fileEvent.getDestinationDirectory()).exists()) {
+			new File(fileEvent.getDestinationDirectory()).mkdirs();
+		}
+		File dstFile = new File(outputFile);
+		FileOutputStream fileOutputStream = null;
+		try {
+			fileOutputStream = new FileOutputStream(dstFile);
+			fileOutputStream.write(fileEvent.getFileData());
+			endTime = System.currentTimeMillis();
+			fileOutputStream.flush();
+			fileOutputStream.close();
+	        diffTime = (endTime - startTime)/ 1000;;
+	        System.out.println("time: " + diffTime+ " second(s)");
+			System.out.println("Output file : " + outputFile + " is successfully saved ");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
+  
   public int Activate(int port)
   {		
   	
@@ -59,13 +80,10 @@ public String StringTrans(int port3)
              return line;
 }
   
-  
-
-  
   public static void main(String[] args) {
-    int port = 9999, port2=9998,port3=9997;  //port =  9999;
+    int port = 9999, port2=9998, port3=9997;  //port =  9999;
     server ser=new server();
-    int temp;
+    int temp,s;
     String path,var,filename;
     System.out.println("client를 기다리는 중...");
     File folder;
@@ -92,7 +110,6 @@ public String StringTrans(int port3)
     	}
     	break;
     }
-    System.out.println(var);
     folder=new File(var);
     if(!folder.exists())
     	folder.mkdirs();
@@ -105,29 +122,36 @@ public String StringTrans(int port3)
     	filename+=path.charAt(z);
     	break;
     }
-    
+    s=ser.Activate(port2);
+    folder=new File(filename);
+    if(folder.exists())
+    {
+    	ser.i=0;
+    	continue;
+    }
+    if(s==1)
+    {
     try {
+    	double startTime = System.currentTimeMillis();
       ServerSocket server = new ServerSocket(port);
         System.out.println("This server is listening... (Port: " + port  + ")");
         Socket socket = server.accept();  //새로운 연결 소켓 생성 및 accept대기
         InetSocketAddress isaClient = (InetSocketAddress) socket.getRemoteSocketAddress();
-         
+        
         System.out.println("A client("+isaClient.getAddress().getHostAddress()+
             " is connected. (Port: " +isaClient.getPort() + ")");
-         
-        FileOutputStream fos = new FileOutputStream(filename);
-        InputStream is = socket.getInputStream();
-         
-        double startTime = System.currentTimeMillis(); 
+        
+        FileOutputStream fos=new FileOutputStream(filename);
+        
+        InputStream is = socket.getInputStream(); 
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int readBytes;
         while ((readBytes = is.read(buffer)) != -1) {
           fos.write(buffer, 0, readBytes);
- 
         }  
         double endTime = System.currentTimeMillis();
         double diffTime = (endTime - startTime)/ 1000;;
- 
+
         System.out.println("time: " + diffTime+ " second(s)");
          
         is.close();
@@ -138,6 +162,38 @@ public String StringTrans(int port3)
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+    }
+    else if(s==2)
+    {
+    	try {
+			DatagramSocket socket = null;
+			FileEvent fileEvent = null;
+			socket = new DatagramSocket(port);
+			double startTime;
+			byte[] incomingData = new byte[1024 * 1000 * 50];
+				DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
+				socket.receive(incomingPacket);
+				byte[] data = incomingPacket.getData();
+				ByteArrayInputStream in = new ByteArrayInputStream(data);
+				ObjectInputStream is = new ObjectInputStream(in);
+				fileEvent = (FileEvent) is.readObject();
+				if (fileEvent.getStatus().equalsIgnoreCase("Error")) {
+					System.out.println("Some issue happened while packing the data @ client side");
+					System.exit(0);
+				}
+				startTime=System.currentTimeMillis();
+				ser.createAndWriteFile(fileEvent,startTime,filename);
+			    is.close();
+			    in.close();
+			    socket.close();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+    }
     ser.i=0;
     }
     else if(3==temp)
@@ -146,6 +202,6 @@ public String StringTrans(int port3)
     }
     System.out.println("전송 완료");
   }
-  
-} 
+
+}
 
