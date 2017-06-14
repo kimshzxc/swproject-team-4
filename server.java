@@ -1,44 +1,196 @@
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
- 
+import java.io.*;
+import java.net.*;
+import java.sql.*;
 public class server {
-    
-    static Socket client = new Socket();
-    
-    public static void main(String[] args) throws Exception{
-        ServerSocket soc = new ServerSocket(11111);  //포트 11111로 서버를 개통합니다.
-        System.out.println("Server Start");
-        client = soc.accept();                       //클라이언트의 접속을 받습니다.
-        System.out.println("client accept!");
-        InputStream in = null;                       
-        FileOutputStream out = null;
-        in = client.getInputStream();                //클라이언트로 부터 바이트 단위로 입력을 받는 InputStream을 얻어와 개통합니다.
-        DataInputStream din = new DataInputStream(in);  //InputStream을 이용해 데이터 단위로 입력을 받는 DataInputStream을 개통합니다.
-        
-        while(true){
-            int data = din.readInt();           //Int형 데이터를 전송받습니다.
-        String filename = din.readUTF();            //String형 데이터를 전송받아 filename(파일의 이름으로 쓰일)에 저장합니다.
-        File file = new File(filename);             //입력받은 File의 이름으로 복사하여 생성합니다.
-        out = new FileOutputStream(file);           //생성한 파일을 클라이언트로부터 전송받아 완성시키는 FileOutputStream을 개통합니다.
- 
-        int datas = data;                            //전송횟수, 용량을 측정하는 변수입니다.
-        byte[] buffer = new byte[1024];        //바이트단위로 임시저장하는 버퍼를 생성합니다.
-        int len;                               //전송할 데이터의 길이를 측정하는 변수입니다.
-        
-        
-        for(;data>0;data--){                   //전송받은 data의 횟수만큼 전송받아서 FileOutputStream을 이용하여 File을 완성시킵니다.
-            len = in.read(buffer);
-            out.write(buffer,0,len);
-        }
-        
-        System.out.println("약: "+datas+" kbps");
-        out.flush();
-        out.close();
-        }
+  public static final int DEFAULT_BUFFER_SIZE = 10000;
+  public int i=0;
+
+  public int Activate(int port)
+  {      
+     
+       try {
+           ServerSocket server = new ServerSocket(port);
+             Socket socket = server.accept();  //새로운 연결 소켓 생성 및 accept대기
+             InputStream is = socket.getInputStream();
+
+             i=is.read();
+           is.close();
+             socket.close();
+             server.close();
+           } catch (IOException e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+           }
+       return i;
+}
+  
+
+public String StringTrans(int port3)
+{
+   
+   String line=null;
+             try{
+                ServerSocket server = new ServerSocket(port3);
+                Socket sock = server.accept();
+
+                InputStream in = sock.getInputStream();
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+                    line = br.readLine();
+                    in.close();
+                    br.close();
+                    sock.close();
+                    server.close();
+             } catch(Exception e){
+
+                    System.out.println(e);
+
+             }
+             
+             return line;
+}
+  
+  public static void main(String[] args) {
+    int port = 8888, port2=8887, port3=8886;  //port =  9999;
+    server ser=new server();
+    int temp=0,s=0,fl=2,n=0;
+    String path="",var="",filename="",id="",name="";
+    System.out.println("client를 기다리는 중...\n");
+    File folder;
+    for(;true;)
+    {
+    temp=ser.Activate(port2);
+    if(1==temp)
+    {
+    fl=1;
+    path=ser.StringTrans(port3);
+    name="";
+    filename="C://apache-tomcat-8.5.12//webapps//soft//img//";
+    for(int k=0;k<path.length();k++)
+    if(path.charAt(k)=='\\')
+    {
+       for(int z=k+1;z<path.length();z++)
+       filename+=path.charAt(z);
+       break;
     }
- 
+    
+    for(int k=path.length()-1;k>=0;k--)
+    if(path.charAt(k)=='\\')
+    {
+       for(int z=k+1;z<path.length();z++)
+       name+=path.charAt(z);
+       break;
+    }
+    s=ser.Activate(port2);
+    folder=new File(filename);
+
+    if(folder.exists())
+    fl=0;
+
+    if(s==1)
+    {
+    try {
+       
+      ServerSocket server = new ServerSocket(port);
+        Socket socket = server.accept();  //새로운 연결 소켓 생성 및 accept대기
+        InputStream is = socket.getInputStream();
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        if(fl==1)
+        {
+        System.out.println("This server is listening... (Port: " + port  + ")");
+        int readBytes;
+        int totalreadBytes=0;
+        double startTime = System.currentTimeMillis();
+        FileOutputStream fos=new FileOutputStream(filename);
+        while ((readBytes = is.read(buffer)) != -1) {
+           totalreadBytes+=readBytes;
+          fos.write(buffer, 0, readBytes);
+        }  
+        double endTime = System.currentTimeMillis();
+        double diffTime = (endTime - startTime)/ 1000;;
+        double transferSpeed = (totalreadBytes / 1000)/ diffTime;
+        System.out.println("time: " + diffTime+ " second(s)");
+        System.out.println("Average transfer speed: " + transferSpeed + " KB/s");
+        System.out.println("File transfer completed.\n");
+        System.out.println("전송 완료\n");
+        fos.close();
+
+        }
+        else if(fl==0)
+        while (is.read(buffer)!= -1);
+        is.close();
+        socket.close();
+        server.close();
+        Connection con = null;
+        Statement stmt = null;
+        String driver = "com.mysql.jdbc.Driver";
+        String dbURL = "jdbc:mysql://localhost:3306/test";
+        
+        
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    else if(s==2)
+    {
+          try {
+            int nReadSize = 0;
+            byte[] buffer = new byte[65536];
+            DatagramSocket ds = new DatagramSocket(port);
+            DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+              if(fl==1)
+              {
+            FileOutputStream fos = new FileOutputStream(filename);
+              System.out.println("This server is listening... (Port: " + port  + ")");
+                  double startTime = System.currentTimeMillis(); 
+                    ds.receive(dp);
+                    nReadSize = dp.getLength();
+                      fos.write(dp.getData(), 0, nReadSize);
+
+                double endTime = System.currentTimeMillis();
+                double diffTime = (endTime - startTime)/ 1000;
+                double transferSpeed = (nReadSize / 1000)/ diffTime;
+                 
+                System.out.println("time: " + diffTime+ " second(s)");
+                System.out.println("Average transfer speed: " + transferSpeed + " KB/s");
+                  System.out.println("File transfer completed.\n");
+                  System.out.println("전송 완료\n");
+                  fos.close();
+              }
+              else if(fl==0)
+              ds.receive(dp);
+              ds.close();
+              Connection con = null;
+              Statement stmt = null;
+              
+              
+          } catch (Exception e) {}
+    }
+    }
+    else if(3==temp)
+    {
+    s=0;
+    fl=2;
+    n=0;
+    id="";
+    name="";
+    path="";
+    var="";
+    filename="";
+    System.out.println("client를 기다리는 중...\n");
+    }
+    else if(4==temp)
+    {
+       id=ser.StringTrans(port3);
+        var="C://apache-tomcat-8.5.12//webapps//soft//img//"+id;
+        folder=new File(var);
+        if(!folder.exists())
+           folder.mkdirs();
+    }
+    ser.i=0;
+    }
+  }
+
 }

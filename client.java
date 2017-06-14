@@ -1,55 +1,264 @@
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+
+
+import java.io.*;
+import java.net.*;
 import java.util.Scanner;
- 
-public class client{
-    public static void main(String[] args){
-        OutputStream out;
-        FileInputStream fin;
+import javax.swing.JTextArea;
+
+class client {
+public static final int DEFAULT_BUFFER_SIZE = 10000;
+
+
+public void StringTrans(String serverIP,int port3,String line)
+{
+
+             try{
+                Socket sock = new Socket(serverIP, port3);
+
+                OutputStream out = sock.getOutputStream();
+
+                PrintWriter pw = new PrintWriter(new OutputStreamWriter(out));
+
+                           pw.println(line);
+                           pw.flush();
+
+                    pw.close();
+                    out.close();
+                    sock.close();
+             }catch(Exception e){
+                    System.out.println(e);
+             }
+}
+
+   public void Transmit(String serverIP, int port, String FileName)
+   {
+
+      File file = new File(FileName);
+       if (!file.exists()) {
+             System.out.println("File not Exist.");
+               System.exit(0);
+           }
+       long fileSize = file.length();
+       long totalReadBytes = 0;
+       byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+       int readBytes;
+       double startTime = 0;
         
-        try{
-            Socket soc = new Socket("127.0.0.1",11111); //127.0.0.1은 루프백 아이피로 자신의 아이피를 반환해주고,
-            System.out.println("Server Start!");        //11111은 서버접속 포트입니다.
-            out =soc.getOutputStream();                 //서버에 바이트단위로 데이터를 보내는 스트림을 개통합니다.
-            DataOutputStream dout = new DataOutputStream(out); //OutputStream을 이용해 데이터 단위로 보내는 스트림을 개통합니다.
+       try {
+               FileInputStream fis = new FileInputStream(file);
+               Socket socket = new Socket(serverIP, port);
+           if(!socket.isConnected()){
+             System.out.println("Socket Connect Error.");
+                 System.exit(0);
+           }
             
             
-            Scanner s = new Scanner(System.in);   //파일 이름을 입력받기위해 스캐너를 생성합니다.
+             OutputStream os = socket.getOutputStream();
+             startTime = System.currentTimeMillis();
+           while ((readBytes = fis.read(buffer)) > 0) {
+             os.write(buffer, 0, readBytes);
+             totalReadBytes += readBytes;
+             //System.out.println("In progress: " + totalReadBytes + "/"
+                // + fileSize + " Byte(s) ("
+                // + (totalReadBytes * 100 / fileSize) + " %)");
+           }
             
-            
-            while(true){
-                String filename = s.next();    //스캐너를 통해 파일의 이름을 입력받고,
-            fin = new FileInputStream(new File(filename)); //FileInputStream - 파일에서 입력받는 스트림을 개통합니다.
-            
-        byte[] buffer = new byte[1024];        //바이트단위로 임시저장하는 버퍼를 생성합니다.
-        int len;                               //전송할 데이터의 길이를 측정하는 변수입니다.
-        int data=0;                            //전송횟수, 용량을 측정하는 변수입니다.
-        
-        while((len = fin.read(buffer))>0){     //FileInputStream을 통해 파일에서 입력받은 데이터를 버퍼에 임시저장하고 그 길이를 측정합니다.
-            data++;                        //데이터의 양을 측정합니다.
+           System.out.println("File transfer completed.");
+
+           double endTime = System.currentTimeMillis();
+            double diffTime = (endTime - startTime)/ 1000;;
+            double transferSpeed = (fileSize / 1000)/ diffTime;
+             
+            System.out.println("time: " + diffTime+ " second(s)");
+            System.out.println("Average transfer speed: " + transferSpeed + " KB/s\n");
+           fis.close();
+           os.close();
+           socket.close();
+       } catch (UnknownHostException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+       } catch (IOException e) {
+         // TODO Auto-generated catch block
+         //e.printStackTrace();
+       }
+
+   }
+   
+   public void Activate(String serverIP, int port, int a)
+   {
+   try{
+      
+        Socket socket = new Socket(serverIP, port);
+        if(!socket.isConnected()){
+        System.out.println("Socket Connect Error.");
+        System.exit(0);
         }
+
+        OutputStream os = socket.getOutputStream();
+
+        os.write(a);
+      
+        os.close();
+        socket.close();
+   } catch (UnknownHostException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+   } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+   }
+
+   }
+   
+    
+   
+   public void Utransmit(String serverIP, int port, String FileName)
+   {
+      
+            File file = new File(FileName);
+              DatagramSocket ds = null;
+              if (!file.exists()) {
+                System.out.println("File not Exist");
+                  System.exit(0);
+              }
+              long fileSize = file.length();
+          long totalReadBytes = 0;
+       
+              double startTime = 0;
+              try {
+                  ds = new DatagramSocket();
+                  InetAddress serverAdd = InetAddress.getByName(serverIP);
+                  FileInputStream fis = new FileInputStream(file);
+                  byte[] buffer = new byte[65536];
+                  startTime = System.currentTimeMillis();
+                    int readBytes = fis.read(buffer, 0, buffer.length);
+                    DatagramPacket dp = new DatagramPacket(buffer, readBytes, serverAdd, port);
+                      ds.send(dp);
+
+                //System.out.println("In progress: " + readBytes + "/"
+                   // + fileSize + " Byte(s) ("
+                   // + (readBytes * 100 / fileSize) + " %)");
+              
+                  System.out.println("File transfer completed.");
+                  double endTime = System.currentTimeMillis();
+                double diffTime = (endTime - startTime)/ 1000;;
+                double transferSpeed = (fileSize / 1000)/ diffTime;
+                 
+                System.out.println("time: " + diffTime+ " second(s)");
+                System.out.println("Average transfer speed: " + transferSpeed + " KB/s\n");
+                
+                  fis.close();
+                  ds.close();
         
-        int datas = data;                      //아래 for문을 통해 data가 0이되기때문에 임시저장한다.
- 
-        fin.close();
-        fin = new FileInputStream(filename);   //FileInputStream이 만료되었으니 새롭게 개통합니다.
-        dout.writeInt(data);                   //데이터 전송횟수를 서버에 전송하고,
-        dout.writeUTF(filename);               //파일의 이름을 서버에 전송합니다.
-        
-         len = 0;
-        
-        for(;data>0;data--){                   //데이터를 읽어올 횟수만큼 FileInputStream에서 파일의 내용을 읽어옵니다.
-            len = fin.read(buffer);        //FileInputStream을 통해 파일에서 입력받은 데이터를 버퍼에 임시저장하고 그 길이를 측정합니다.
-            out.write(buffer,0,len);       //서버에게 파일의 정보(1kbyte만큼보내고, 그 길이를 보냅니다.
-        }
-        
-        System.out.println("약 "+datas+" kbyte");
+              } catch (Exception e) {
+                  System.out.println(e.getMessage());
+              }
+
+      }
+
+   
+   public void FileFunc(String serverIP,int port,int port2,int port3,String Directory, String temp)
+   {
+      File dirFile=new File(Directory);
+      File[] fileList=dirFile.listFiles();
+      for(int i=0;i<fileList.length;i++){
+         if(fileList[i].isFile()){
+            long Size = fileList[i].length();
+            String real=Directory+"\\"+fileList[i].getName();
+            Activate(serverIP, port2, 1);
+            StringTrans(serverIP, port3, temp+"\\"+fileList[i].getName());
+             if(Size<=65536)
+             {
+             Activate(serverIP, port2, 2);
+             Utransmit(serverIP, port, real);
             }
-        }catch(Exception e){
-        }
-        
+             else
+             {
+             Activate(serverIP, port2, 1);   
+             Transmit(serverIP, port, real);
+             }
+         }
+         else if(fileList[i].isDirectory())
+         {
+            Activate(serverIP, port2, 4);
+            StringTrans(serverIP, port3, temp+"\\"+fileList[i].getName()+'\\');
+            String real=Directory+"\\"+fileList[i].getName();
+            FileFunc(serverIP, port, port2, port3, real, temp+"\\"+fileList[i].getName());
+         }
+      }
+   }
+
+   
+   
+  public static void main(String[] args) {
+
+   String serverIP = "114.70.193.139";
+    int port = 8888, port2=8887, port3=8886; //port = 9999;
+    
+  
+    int n;
+    String FileName="",Directory="",str="",protoc="";
+    
+    Scanner protocol=new Scanner(System.in);
+    System.out.println("UDP 전송 : 1 TCP 전송 : 2");
+    protoc=protocol.next();
+    Scanner input=new Scanner(System.in);
+    System.out.println("파일 단일 : 1 디렉토리 전송 : 2");
+    client cli=new client();
+    str=input.next();
+    if(str.equals("1"))
+    {
+    System.out.printf("파일 이름을 입력하세요 : ");   
+    Directory=input.next();
+    System.out.println("");
+   File file = new File(Directory);
+    for(int z=Directory.length()-1;z>=0;z--)
+       if(Directory.charAt(z)=='\\')
+       {
+
+       for(int f=z;f<Directory.length();f++)
+       FileName+=Directory.charAt(f);
+       break;
+       }
+    long Size = file.length();
+    if(protoc.equals("1"))
+    {
+    
+    cli.Activate(serverIP, port2, 1);
+    cli.StringTrans(serverIP, port3, FileName);
+    cli.Activate(serverIP, port2, 1);
+    cli.Transmit(serverIP, port, Directory);
+    cli.Activate(serverIP, port2,3);
     }
+    else
+    {
+    cli.Activate(serverIP, port2, 1);
+    cli.StringTrans(serverIP, port3, FileName);
+    cli.Activate(serverIP, port2, 2);
+    cli.Utransmit(serverIP, port,Directory);
+    cli.Activate(serverIP, port2,3);
+    }
+    System.out.println("전송 완료");
+    }
+  else if(str.equals("2")){
+     Directory=input.next();
+     System.out.println("");
+     System.out.printf("");   
+      String temp="";
+      for(int i=Directory.length()-1;true;i--)
+      {
+         if(Directory.charAt(i)=='\\')
+         {
+            for(int j=i;j<Directory.length();j++)
+            temp+=Directory.charAt(j);
+         break;
+         }
+      }
+     cli.Activate(serverIP, port2, 4);
+     cli.StringTrans(serverIP, port3, temp+'\\');
+     cli.FileFunc(serverIP, port, port2, port3, Directory,temp);
+     cli.Activate(serverIP, port2, 3);
+     System.out.println("전송 완료");
+     }
+   }
 }
