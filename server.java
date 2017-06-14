@@ -1,6 +1,6 @@
 import java.io.*;
 import java.net.*;
-import java.sql.*;
+
 public class server {
   public static final int DEFAULT_BUFFER_SIZE = 10000;
   public int i=0;
@@ -54,32 +54,25 @@ public String StringTrans(int port3)
   public static void main(String[] args) {
     int port = 8888, port2=8887, port3=8886;  //port =  9999;
     server ser=new server();
-    int temp=0,s=0,fl=2,n=0;
-    String path="",var="",filename="",id="",name="";
+    int temp,s,fl;
+    String path,var,filename,serverIP;
     System.out.println("client를 기다리는 중...\n");
     File folder;
     for(;true;)
     {
+
     temp=ser.Activate(port2);
     if(1==temp)
     {
     fl=1;
     path=ser.StringTrans(port3);
-    name="";
-    filename="C://apache-tomcat-8.5.12//webapps//soft//img//";
+
+    filename="";
     for(int k=0;k<path.length();k++)
     if(path.charAt(k)=='\\')
     {
        for(int z=k+1;z<path.length();z++)
        filename+=path.charAt(z);
-       break;
-    }
-    
-    for(int k=path.length()-1;k>=0;k--)
-    if(path.charAt(k)=='\\')
-    {
-       for(int z=k+1;z<path.length();z++)
-       name+=path.charAt(z);
        break;
     }
     s=ser.Activate(port2);
@@ -113,21 +106,14 @@ public String StringTrans(int port3)
         System.out.println("time: " + diffTime+ " second(s)");
         System.out.println("Average transfer speed: " + transferSpeed + " KB/s");
         System.out.println("File transfer completed.\n");
-        System.out.println("전송 완료\n");
         fos.close();
-
         }
         else if(fl==0)
         while (is.read(buffer)!= -1);
+        
         is.close();
         socket.close();
         server.close();
-        Connection con = null;
-        Statement stmt = null;
-        String driver = "com.mysql.jdbc.Driver";
-        String dbURL = "jdbc:mysql://localhost:3306/test";
-        
-        
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -156,41 +142,45 @@ public String StringTrans(int port3)
                 System.out.println("time: " + diffTime+ " second(s)");
                 System.out.println("Average transfer speed: " + transferSpeed + " KB/s");
                   System.out.println("File transfer completed.\n");
-                  System.out.println("전송 완료\n");
                   fos.close();
               }
               else if(fl==0)
               ds.receive(dp);
-              ds.close();
-              Connection con = null;
-              Statement stmt = null;
               
-              
+                ds.close();
           } catch (Exception e) {}
-    }
-    }
-    else if(3==temp)
-    {
-    s=0;
-    fl=2;
-    n=0;
-    id="";
-    name="";
-    path="";
-    var="";
-    filename="";
-    System.out.println("client를 기다리는 중...\n");
-    }
-    else if(4==temp)
-    {
-       id=ser.StringTrans(port3);
-        var="C://apache-tomcat-8.5.12//webapps//soft//img//"+id;
-        folder=new File(var);
-        if(!folder.exists())
-           folder.mkdirs();
     }
     ser.i=0;
     }
+    else if(3==temp)
+    break;
+    else if(4==temp)
+    {
+       path=ser.StringTrans(port3);
+        var="";
+        for(int k=0;k<path.length();k++)
+        if(path.charAt(k)=='\\')
+        {
+           for(int z=path.length()-1;z>=0;z--)
+           if(path.charAt(z)=='\\')
+           {
+
+           for(int f=k+1;f<z;f++)
+           var+=path.charAt(f);
+           
+           break;
+           }
+           break;
+        }
+        folder=new File(var);
+        if(!folder.exists())
+           folder.mkdirs();
+        
+        ser.i=0;
+    }
+    }
+    System.out.println("전송 완료");
+
   }
 
 }

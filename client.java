@@ -1,4 +1,4 @@
-
+package 기능구현;
 
 import java.io.*;
 import java.net.*;
@@ -58,9 +58,11 @@ public void StringTrans(String serverIP,int port3,String line)
            while ((readBytes = fis.read(buffer)) > 0) {
              os.write(buffer, 0, readBytes);
              totalReadBytes += readBytes;
-             //System.out.println("In progress: " + totalReadBytes + "/"
-                // + fileSize + " Byte(s) ("
-                // + (totalReadBytes * 100 / fileSize) + " %)");
+             /*
+             System.out.println("In progress: " + totalReadBytes + "/"
+                 + fileSize + " Byte(s) ("
+                 + (totalReadBytes * 100 / fileSize) + " %)");
+                 */
            }
             
            System.out.println("File transfer completed.");
@@ -135,10 +137,10 @@ public void StringTrans(String serverIP,int port3,String line)
                     DatagramPacket dp = new DatagramPacket(buffer, readBytes, serverAdd, port);
                       ds.send(dp);
 
-                //System.out.println("In progress: " + readBytes + "/"
-                   // + fileSize + " Byte(s) ("
-                   // + (readBytes * 100 / fileSize) + " %)");
-              
+                /*System.out.println("In progress: " + readBytes + "/"
+                    + fileSize + " Byte(s) ("
+                    + (readBytes * 100 / fileSize) + " %)");
+              */
                   System.out.println("File transfer completed.");
                   double endTime = System.currentTimeMillis();
                 double diffTime = (endTime - startTime)/ 1000;;
@@ -194,14 +196,10 @@ public void StringTrans(String serverIP,int port3,String line)
 
    String serverIP = "114.70.193.139";
     int port = 8888, port2=8887, port3=8886; //port = 9999;
+
     
-  
     int n;
-    String FileName="",Directory="",str="",protoc="";
-    
-    Scanner protocol=new Scanner(System.in);
-    System.out.println("UDP 전송 : 1 TCP 전송 : 2");
-    protoc=protocol.next();
+    String FileName="",Directory="",str="";
     Scanner input=new Scanner(System.in);
     System.out.println("파일 단일 : 1 디렉토리 전송 : 2");
     client cli=new client();
@@ -221,9 +219,9 @@ public void StringTrans(String serverIP,int port3,String line)
        break;
        }
     long Size = file.length();
-    if(protoc.equals("1"))
+    if(Size>65536)
     {
-    
+    System.out.println("TCP로 전송합니다.");
     cli.Activate(serverIP, port2, 1);
     cli.StringTrans(serverIP, port3, FileName);
     cli.Activate(serverIP, port2, 1);
@@ -232,6 +230,7 @@ public void StringTrans(String serverIP,int port3,String line)
     }
     else
     {
+    System.out.println("UDP로 전송합니다.");
     cli.Activate(serverIP, port2, 1);
     cli.StringTrans(serverIP, port3, FileName);
     cli.Activate(serverIP, port2, 2);
@@ -241,6 +240,7 @@ public void StringTrans(String serverIP,int port3,String line)
     System.out.println("전송 완료");
     }
   else if(str.equals("2")){
+     System.out.println("TCP로 전송합니다.");
      Directory=input.next();
      System.out.println("");
      System.out.printf("");   
