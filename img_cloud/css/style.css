@@ -1,0 +1,181 @@
+body {
+    font-family: sans-serif;
+}
+
+#formMain {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#title {
+    position: absolute;
+    color: black;
+    top: calc(65% - 80px);
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+img {
+    width: 50%;
+    max-width: 300px;
+    height: auto;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-name: example;
+    animation-duration: 3s;
+    animation-fill-mode: both;
+    opacity: 0.0;
+}
+
+@keyframes example {
+    from {
+        top: 0%;
+        opacity: 0.0;
+    }
+    to {
+        opacity: 1.0;
+        top: 10%;
+    }
+}
+
+h2 {
+    position: absolute;
+    color: #1AAB8A;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+span {
+    font-weight: 800;
+    font-size: 25px;
+    color: #1AAB8A;
+}
+
+@media (min-width:414px) {
+    .textfeild {
+        width: 140px;
+        height: 30px;
+        border: none;
+        border-radius: 5px;
+        border: 2px solid #1AAB8A;
+    }
+    table td {
+        text-align: center;
+    }
+    button {
+        width: 100%;
+        height: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        background: #1AAB8A;
+        color: #fff;
+        border: none;
+        position: relative;
+        font-size: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+        transition: 800ms ease all;
+        outline: none;
+    }
+    button:hover {
+        background: #fff;
+        color: #1AAB8A;
+    }
+    button:before, button:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 2px;
+        width: 0;
+        background: #1AAB8A;
+        transition: 400ms ease all;
+    }
+    button:after {
+        right: inherit;
+        top: inherit;
+        left: 0;
+        bottom: 0;
+    }
+    button:hover:before, button:hover:after {
+        width: 100%;
+        transition: 800ms ease all;
+    }
+    a {
+        font-weight: 600;
+        color: black;
+        text-decoration: none;
+    }
+}
+
+.textfeild {
+    width: 140px;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    border: 2px solid #1AAB8A;
+}
+
+table td {
+    text-align: center;
+}
+
+button {
+    width: 100%;
+    height: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #1AAB8A;
+    color: #fff;
+    border: none;
+    position: relative;
+    font-size: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+    transition: 800ms ease all;
+    outline: none;
+}
+
+button:hover {
+    background: #fff;
+    color: #1AAB8A;
+}
+
+button:before, button:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 2px;
+    width: 0;
+    background: #1AAB8A;
+    transition: 400ms ease all;
+}
+
+button:after {
+    right: inherit;
+    top: inherit;
+    left: 0;
+    bottom: 0;
+}
+
+button:hover:before, button:hover:after {
+    width: 100%;
+    transition: 800ms ease all;
+}
+
+a {
+    font-weight: 600;
+    color: black;
+    text-decoration: none;
+}
